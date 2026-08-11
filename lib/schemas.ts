@@ -216,6 +216,8 @@ export const siteSettingsSchema = z.object({
   bankName: req(30, "은행명을 입력하세요."),
   bankAccountNumber: req(50, "계좌번호를 입력하세요."),
   bankAccountHolder: req(50, "예금주를 입력하세요."),
+  payEnableVirtual: z.boolean(),
+  payEnableDirect: z.boolean(),
   quoteValidDays: z
     .number()
     .int("정수여야 합니다.")
@@ -254,6 +256,9 @@ export const orderDraftSchema = z.object({
     address: z.string().trim().min(1, "배송지를 입력하세요.").max(200),
     memo: z.string().trim().max(200).optional(),
   }),
+  // 결제수단 — virtual: 토스 가상계좌(자동확인) / direct: 고정계좌 무통장입금(수동확인).
+  // 없으면 기존 동작(가상계좌)으로 간주한다.
+  paymentMethod: z.enum(["virtual", "direct"]).default("virtual"),
   depositor: z.string().trim().min(1, "입금자명을 입력하세요.").max(50),
   // 증빙은 택1 — 세금계산서(사업자) / 현금영수증(개인) / 안 받음. 둘 다 발급되는 일이 없다.
   evidence: z.discriminatedUnion("type", [

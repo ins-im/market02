@@ -63,6 +63,9 @@ export interface SiteSettings {
   bankName: string;
   bankAccountNumber: string;
   bankAccountHolder: string;
+  // 결제수단 노출 토글(체크아웃)
+  payEnableVirtual: boolean; // 토스 가상계좌(자동확인)
+  payEnableDirect: boolean; // 고정계좌 무통장입금(수동확인)
   quoteValidDays: number;
   csEmail: string;
   csTel: string;

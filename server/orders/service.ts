@@ -2,6 +2,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/server/db";
 import { makeOrderNo } from "@/lib/orders";
 import { bankLabel } from "@/server/payments/toss";
+import { getSiteSettings } from "@/server/settings/service";
 import type { Order, OrderStatus, OrderDraftInput } from "@/lib/orders";
 import type { CartItem } from "@/lib/types";
 
@@ -55,6 +56,7 @@ function toOrder(o: OrderRow): Order {
     orderNo: o.orderNo,
     createdAt: o.createdAt.toISOString(),
     status: STATUS_MAP[o.status] ?? "pending",
+    paymentMethod: o.paymentMethod === "DIRECT_TRANSFER" ? "direct" : "virtual",
     items,
     total: o.total,
     supply: o.supply,
@@ -109,6 +111,16 @@ export async function placeOrder(
   const { name, tel, address } = input.orderer;
   if (!name.trim() || !tel.trim() || !address.trim() || !input.depositor.trim()) {
     throw new OrderError("주문자·배송·입금자 정보를 모두 입력해주세요.");
+  }
+
+  // 결제수단 결정 + 노출 여부 검증(관리자 설정에서 꺼진 수단은 거부).
+  const payMethod = input.paymentMethod ?? "virtual";
+  const settings = await getSiteSettings();
+  if (payMethod === "virtual" && !settings.payEnableVirtual) {
+    throw new OrderError("현재 가상계좌 결제를 사용할 수 없습니다.");
+  }
+  if (payMethod === "direct" && !settings.payEnableDirect) {
+    throw new OrderError("현재 무통장입금(고정계좌) 결제를 사용할 수 없습니다.");
   }
   // 증빙(택1) 검증 — 세금계산서면 사업자번호, 현금영수증이면 휴대폰번호가 필요하다.
   if (input.evidence.type === "tax_invoice") {
@@ -197,7 +209,8 @@ export async function placeOrder(
           ordererAddress: address.trim(),
           ordererMemo: input.orderer.memo?.trim() || null,
           depositorName: input.depositor.trim(),
-          paymentMethod: "BANK_TRANSFER",
+          paymentMethod:
+            payMethod === "direct" ? "DIRECT_TRANSFER" : "BANK_TRANSFER",
           status: "PENDING",
           supply,
           vat,
@@ -206,14 +219,24 @@ export async function placeOrder(
           items: { create: lineItems },
           taxInvoice: taxData,
           cashReceipt: cashData,
-          // 가상계좌(토스페이먼츠) 결제 건. 발급 전에는 READY 이며, 발급/입금 시 승인·웹훅으로 갱신.
+          // 결제 건. 가상계좌는 토스 발급/웹훅으로 갱신, 고정계좌는 관리자 수동확인 대상(수기).
+          //  - virtual: provider TOSS, 발급 전 READY. 발급/입금 시 승인·웹훅으로 갱신.
+          //  - direct : provider MANUAL, vaDueDate 없음 → reconcile(토스 동기화) 대상에서 제외됨.
           payment: {
-            create: {
-              provider: "TOSS",
-              method: "가상계좌",
-              status: "READY",
-              amount: total,
-            },
+            create:
+              payMethod === "direct"
+                ? {
+                    provider: "NONE", // PG 미사용(고정계좌 수기입금)
+                    method: "무통장입금(고정계좌)",
+                    status: "READY",
+                    amount: total,
+                  }
+                : {
+                    provider: "TOSS",
+                    method: "가상계좌",
+                    status: "READY",
+                    amount: total,
+                  },
           },
         },
         include: { items: true, taxInvoice: true, cashReceipt: true, payment: true },

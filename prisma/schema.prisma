@@ -238,10 +238,15 @@ model SiteSetting {
   supplierCategory String
   supplierTel      String
 
-  // 무통장입금 계좌
+  // 무통장입금 계좌(고정계좌 · 수동확인)
   bankName          String
   bankAccountNumber String
   bankAccountHolder String
+
+  // 결제수단 노출 토글 — 체크아웃에 어떤 수단을 보여줄지.
+  //  virtual: 토스 가상계좌(자동확인) / direct: 위 고정계좌 무통장입금(수동확인)
+  payEnableVirtual Boolean @default(true)
+  payEnableDirect  Boolean @default(false)
 
   // 견적서 유효기간(발행일로부터 일수)
   quoteValidDays Int @default(14)
@@ -317,7 +322,8 @@ enum OrderStatus {
 }
 
 enum PaymentMethod {
-  BANK_TRANSFER // 무통장입금(가상계좌)
+  BANK_TRANSFER // 무통장입금(토스 가상계좌 · 자동확인)
+  DIRECT_TRANSFER // 무통장입금(고정계좌 · 관리자 수동확인)
   PG // 카드 등 PG 결제
 }
 

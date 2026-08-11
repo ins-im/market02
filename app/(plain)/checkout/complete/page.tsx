@@ -4,6 +4,7 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useCart } from "@/hooks/useCart";
+import { useSiteSettings } from "@/components/SiteSettingsProvider";
 import { formatPrice } from "@/lib/utils";
 import { formatDateTime } from "@/lib/datetime";
 import { type Order } from "@/lib/orders";
@@ -12,6 +13,7 @@ import styles from "../page.module.css";
 function CompleteInner() {
   const params = useSearchParams();
   const { clearCart } = useCart();
+  const settings = useSiteSettings();
   const [status, setStatus] = useState<"confirming" | "done" | "error">(
     "confirming",
   );
@@ -22,12 +24,38 @@ function CompleteInner() {
   const paymentKey = params.get("paymentKey");
   const orderId = params.get("orderId");
   const amount = params.get("amount");
+  // 고정계좌(무통장입금) 흐름: 토스를 거치지 않고 orderNo 로 넘어온다.
+  const directOrderNo = params.get("method") === "direct" ? params.get("orderNo") : null;
 
   useEffect(() => {
     if (ran.current) return;
     ran.current = true;
 
     (async () => {
+      // 고정계좌 주문: 승인 없이 주문을 조회해 고정계좌 안내를 보여준다.
+      if (directOrderNo) {
+        try {
+          const res = await fetch(
+            `/api/orders/${encodeURIComponent(directOrderNo)}`,
+            { cache: "no-store" },
+          );
+          const data = await res.json();
+          if (!res.ok) {
+            setError(data.error ?? "주문을 불러오지 못했습니다.");
+            setStatus("error");
+            return;
+          }
+          setOrder(data.order as Order);
+          clearCart();
+          setStatus("done");
+          window.scrollTo(0, 0);
+        } catch {
+          setError("네트워크 오류가 발생했습니다.");
+          setStatus("error");
+        }
+        return;
+      }
+
       if (!paymentKey || !orderId || !amount) {
         setError("결제 정보가 올바르지 않습니다.");
         setStatus("error");
@@ -54,7 +82,7 @@ function CompleteInner() {
         setStatus("error");
       }
     })();
-  }, [paymentKey, orderId, amount, clearCart]);
+  }, [paymentKey, orderId, amount, directOrderNo, clearCart]);
 
   if (status === "confirming") {
     return (
@@ -88,47 +116,97 @@ function CompleteInner() {
       <div className={styles.doneCard}>
         <p className={styles.doneBadge}>주문 접수 완료</p>
         <h1 className={styles.doneTitle}>입금을 기다리고 있습니다</h1>
-        <p className={styles.doneText}>
-          주문번호 <strong>{order.orderNo}</strong>
-          <br />
-          아래 <strong>전용 가상계좌</strong>로 입금해주시면 자동으로 확인됩니다.
-        </p>
 
-        {order.virtualAccount ? (
-          <dl className={styles.depositBox}>
-            <div>
-              <dt>입금 은행</dt>
-              <dd>{order.virtualAccount.bankLabel}</dd>
-            </div>
-            <div>
-              <dt>가상계좌번호</dt>
-              <dd>{order.virtualAccount.accountNumber}</dd>
-            </div>
-            <div className={styles.depositAmount}>
-              <dt>입금 금액</dt>
-              <dd>{formatPrice(order.total)}</dd>
-            </div>
-            {order.virtualAccount.dueDate && (
+        {order.paymentMethod === "direct" ? (
+          // ── 고정계좌 무통장입금(수동확인) ──────────────────────
+          <>
+            <p className={styles.doneText}>
+              주문번호 <strong>{order.orderNo}</strong>
+              <br />
+              아래 계좌로 입금해주시면 담당자 확인 후 처리됩니다.
+            </p>
+
+            <dl className={styles.depositBox}>
               <div>
-                <dt>입금 기한</dt>
-                <dd>
-                  {formatDateTime(order.virtualAccount.dueDate)}
-                </dd>
+                <dt>입금 은행</dt>
+                <dd>{settings.bankName}</dd>
               </div>
-            )}
-          </dl>
-        ) : (
-          <p className={styles.doneText}>
-            전용 가상계좌를 발급 중입니다. 잠시 후{" "}
-            <Link href="/mypage/orders">주문내역</Link>에서 계좌번호를
-            확인해주세요.
-          </p>
-        )}
+              <div>
+                <dt>계좌번호</dt>
+                <dd>{settings.bankAccountNumber}</dd>
+              </div>
+              <div>
+                <dt>예금주</dt>
+                <dd>{settings.bankAccountHolder}</dd>
+              </div>
+              <div className={styles.depositAmount}>
+                <dt>입금 금액</dt>
+                <dd>{formatPrice(order.total)}</dd>
+              </div>
+            </dl>
 
-        <p className={styles.doneNotice}>
-          입금이 확인되면 <strong>자동으로</strong> 주문이 처리됩니다. 입금기한이
-          지나면 주문은 자동 취소됩니다.
-          {order.taxInvoice.requested && (
+            <p className={styles.doneNotice}>
+              입금하신 뒤 <strong>입금자명</strong>이 다르면 확인이 늦어질 수
+              있습니다. 입금이 확인되면 주문이 처리됩니다.
+              {order.taxInvoice.requested && (
+                <>
+                  <br />
+                  세금계산서는 입금 확인 후 사업자등록번호{" "}
+                  <strong>{order.taxInvoice.bizNo}</strong> 로 발행됩니다.
+                </>
+              )}
+              {order.cashReceipt.requested && (
+                <>
+                  <br />
+                  현금영수증(소득공제용)은 입금 확인 후{" "}
+                  <strong>{order.cashReceipt.phone}</strong> 로 발급됩니다.
+                </>
+              )}
+            </p>
+          </>
+        ) : (
+          // ── 토스 가상계좌(자동확인) ────────────────────────────
+          <>
+            <p className={styles.doneText}>
+              주문번호 <strong>{order.orderNo}</strong>
+              <br />
+              아래 <strong>전용 가상계좌</strong>로 입금해주시면 자동으로
+              확인됩니다.
+            </p>
+
+            {order.virtualAccount ? (
+              <dl className={styles.depositBox}>
+                <div>
+                  <dt>입금 은행</dt>
+                  <dd>{order.virtualAccount.bankLabel}</dd>
+                </div>
+                <div>
+                  <dt>가상계좌번호</dt>
+                  <dd>{order.virtualAccount.accountNumber}</dd>
+                </div>
+                <div className={styles.depositAmount}>
+                  <dt>입금 금액</dt>
+                  <dd>{formatPrice(order.total)}</dd>
+                </div>
+                {order.virtualAccount.dueDate && (
+                  <div>
+                    <dt>입금 기한</dt>
+                    <dd>{formatDateTime(order.virtualAccount.dueDate)}</dd>
+                  </div>
+                )}
+              </dl>
+            ) : (
+              <p className={styles.doneText}>
+                전용 가상계좌를 발급 중입니다. 잠시 후{" "}
+                <Link href="/mypage/orders">주문내역</Link>에서 계좌번호를
+                확인해주세요.
+              </p>
+            )}
+
+            <p className={styles.doneNotice}>
+              입금이 확인되면 <strong>자동으로</strong> 주문이 처리됩니다.
+              입금기한이 지나면 주문은 자동 취소됩니다.
+              {order.taxInvoice.requested && (
             <>
               <br />
               세금계산서는 입금 확인 후 사업자등록번호{" "}
@@ -142,7 +220,9 @@ function CompleteInner() {
               <strong>{order.cashReceipt.phone}</strong> 로 발급됩니다.
             </>
           )}
-        </p>
+            </p>
+          </>
+        )}
 
         <div className={styles.doneActions}>
           <Link href="/" className={styles.primaryAction}>

@@ -13,6 +13,8 @@ export interface Order {
   orderNo: string;
   createdAt: string; // ISO
   status: OrderStatus; // 저장된 실제 상태(관리자가 진행) — 더 이상 시간 기반 목이 아님
+  // virtual: 토스 가상계좌(자동확인) / direct: 고정계좌 무통장입금(수동확인)
+  paymentMethod: "virtual" | "direct";
   items: CartItem[];
   total: number;
   supply: number;
@@ -63,6 +65,8 @@ export type EvidenceInput =
 
 export interface OrderDraftInput {
   orderer: { name: string; tel: string; address: string; memo?: string };
+  // virtual: 토스 가상계좌(자동확인) / direct: 고정계좌 무통장입금(수동확인)
+  paymentMethod?: "virtual" | "direct";
   depositor: string;
   evidence: EvidenceInput;
   items: {

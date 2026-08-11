@@ -48,6 +48,8 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
   bankName: BANK_ACCOUNT.bank,
   bankAccountNumber: BANK_ACCOUNT.number,
   bankAccountHolder: BANK_ACCOUNT.holder,
+  payEnableVirtual: true,
+  payEnableDirect: false,
   quoteValidDays: QUOTE_VALID_DAYS,
   csEmail: "help@mmm-market.com",
   csTel: "02-000-0000",

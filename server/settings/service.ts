@@ -17,6 +17,8 @@ function toSettings(row: {
   bankName: string;
   bankAccountNumber: string;
   bankAccountHolder: string;
+  payEnableVirtual: boolean;
+  payEnableDirect: boolean;
   quoteValidDays: number;
   csEmail: string;
   csTel: string;
@@ -31,6 +33,8 @@ function toSettings(row: {
     bankName: row.bankName,
     bankAccountNumber: row.bankAccountNumber,
     bankAccountHolder: row.bankAccountHolder,
+    payEnableVirtual: row.payEnableVirtual,
+    payEnableDirect: row.payEnableDirect,
     quoteValidDays: row.quoteValidDays,
     csEmail: row.csEmail,
     csTel: row.csTel,

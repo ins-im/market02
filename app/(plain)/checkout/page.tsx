@@ -63,6 +63,15 @@ export default function CheckoutPage() {
   // 무통장입금 정보
   const [depositor, setDepositor] = useState("");
 
+  // 결제수단 — 관리자 설정에서 켜진 것만 노출. virtual: 토스 가상계좌 / direct: 고정계좌 수동확인.
+  const payMethods: ("virtual" | "direct")[] = [
+    ...(settings.payEnableVirtual ? (["virtual"] as const) : []),
+    ...(settings.payEnableDirect ? (["direct"] as const) : []),
+  ];
+  const [payMethod, setPayMethod] = useState<"virtual" | "direct">(
+    payMethods[0] ?? "virtual",
+  );
+
   // 증빙(택1): 세금계산서(사업자) / 현금영수증(개인) / 안 받음
   const [evidence, setEvidence] = useState<
     "tax_invoice" | "cash_receipt" | "none"
@@ -157,6 +166,7 @@ export default function CheckoutPage() {
             address,
             memo: memo || undefined,
           },
+          paymentMethod: payMethod,
           depositor,
           evidence:
             evidence === "tax_invoice"
@@ -196,6 +206,15 @@ export default function CheckoutPage() {
             address: address.trim(),
           }),
         }).catch(() => {});
+      }
+
+      // 고정계좌(무통장입금·수동확인): 토스를 거치지 않고 바로 완료 페이지로 이동한다.
+      // 입금 확인은 관리자가 주문관리에서 수동으로 처리한다.
+      if (payMethod === "direct") {
+        router.push(
+          `/checkout/complete?orderNo=${encodeURIComponent(order.orderNo)}&method=direct`,
+        );
+        return;
       }
 
       // ② 토스 가상계좌 결제창 (orderId = 주문번호). 성공 시 successUrl 로 리다이렉트된다.
@@ -402,28 +421,77 @@ export default function CheckoutPage() {
             </p>
           </section>
 
-          {/* 결제수단: 무통장입금 */}
+          {/* 결제수단: 가상계좌(토스) / 고정계좌 무통장입금(수동확인) */}
           <section className={styles.section}>
             <h2 className={styles.sectionTitle}>결제수단</h2>
-            <div className={styles.payMethod}>
-              <span className={styles.radioOn} aria-hidden />
-              무통장입금 (가상계좌)
-            </div>
 
-            <dl className={styles.accountBox}>
-              <div>
-                <dt>입금 방법</dt>
-                <dd>주문 시 전용 가상계좌가 발급됩니다</dd>
+            {payMethods.length > 1 ? (
+              // 둘 다 켜져 있으면 고객이 선택
+              <div className={styles.evidenceChoices}>
+                <label className={styles.evidenceChoice}>
+                  <input
+                    type="radio"
+                    name="payMethod"
+                    checked={payMethod === "virtual"}
+                    onChange={() => setPayMethod("virtual")}
+                  />
+                  가상계좌 (자동 입금확인)
+                </label>
+                <label className={styles.evidenceChoice}>
+                  <input
+                    type="radio"
+                    name="payMethod"
+                    checked={payMethod === "direct"}
+                    onChange={() => setPayMethod("direct")}
+                  />
+                  무통장입금 (고정계좌)
+                </label>
               </div>
-              <div>
-                <dt>입금 확인</dt>
-                <dd>입금하시면 자동으로 확인됩니다</dd>
+            ) : (
+              // 하나만 켜져 있으면 그 수단으로 고정 표시
+              <div className={styles.payMethod}>
+                <span className={styles.radioOn} aria-hidden />
+                {payMethod === "virtual"
+                  ? "무통장입금 (가상계좌)"
+                  : "무통장입금 (고정계좌)"}
               </div>
-              <div>
-                <dt>공급자 사업자등록번호</dt>
-                <dd>{settings.supplierBizNo}</dd>
-              </div>
-            </dl>
+            )}
+
+            {payMethod === "virtual" ? (
+              <dl className={styles.accountBox}>
+                <div>
+                  <dt>입금 방법</dt>
+                  <dd>주문 시 전용 가상계좌가 발급됩니다</dd>
+                </div>
+                <div>
+                  <dt>입금 확인</dt>
+                  <dd>입금하시면 자동으로 확인됩니다</dd>
+                </div>
+                <div>
+                  <dt>공급자 사업자등록번호</dt>
+                  <dd>{settings.supplierBizNo}</dd>
+                </div>
+              </dl>
+            ) : (
+              <dl className={styles.accountBox}>
+                <div>
+                  <dt>입금 은행</dt>
+                  <dd>{settings.bankName}</dd>
+                </div>
+                <div>
+                  <dt>계좌번호</dt>
+                  <dd>{settings.bankAccountNumber}</dd>
+                </div>
+                <div>
+                  <dt>예금주</dt>
+                  <dd>{settings.bankAccountHolder}</dd>
+                </div>
+                <div>
+                  <dt>입금 확인</dt>
+                  <dd>입금 후 담당자가 확인하면 처리됩니다</dd>
+                </div>
+              </dl>
+            )}
 
             <div className={styles.field}>
               <label className={styles.label}>입금자명</label>

@@ -5,8 +5,11 @@ import { useRouter } from "next/navigation";
 import type { SiteSettings } from "@/lib/types";
 import styles from "@/app/admin/admin.module.css";
 
-// 문자열 필드 키(= quoteValidDays 제외 전부)
-type StrKey = Exclude<keyof SiteSettings, "quoteValidDays">;
+// 문자열 필드 키(= 숫자 quoteValidDays·불리언 결제토글 제외 전부)
+type StrKey = Exclude<
+  keyof SiteSettings,
+  "quoteValidDays" | "payEnableVirtual" | "payEnableDirect"
+>;
 
 export default function SettingsForm({ settings }: { settings: SiteSettings }) {
   const router = useRouter();
@@ -18,10 +21,19 @@ export default function SettingsForm({ settings }: { settings: SiteSettings }) {
   const set = (key: StrKey, value: string) =>
     setForm((f) => ({ ...f, [key]: value }));
 
+  // 불리언(결제수단 노출 토글)용 세터
+  const setBool = (key: "payEnableVirtual" | "payEnableDirect", value: boolean) =>
+    setForm((f) => ({ ...f, [key]: value }));
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setSaved(false);
+    // 결제수단은 최소 하나는 켜져 있어야 체크아웃이 성립한다.
+    if (!form.payEnableVirtual && !form.payEnableDirect) {
+      setError("결제수단은 최소 하나 이상 켜져 있어야 합니다.");
+      return;
+    }
     setSaving(true);
     try {
       const res = await fetch("/api/admin/settings", {
@@ -70,10 +82,40 @@ export default function SettingsForm({ settings }: { settings: SiteSettings }) {
 
       <div className={styles.card} style={{ padding: 24, marginBottom: 20 }}>
         <h2 className={styles.sectionTitle}>무통장입금 계좌</h2>
-        <p className={styles.sectionDesc}>체크아웃 무통장입금 안내에 표시됩니다.</p>
+        <p className={styles.sectionDesc}>
+          체크아웃 무통장입금(고정계좌) 안내에 표시됩니다.
+        </p>
         {field("bankName", "은행")}
         {field("bankAccountNumber", "계좌번호")}
         {field("bankAccountHolder", "예금주")}
+      </div>
+
+      <div className={styles.card} style={{ padding: 24, marginBottom: 20 }}>
+        <h2 className={styles.sectionTitle}>결제수단 노출</h2>
+        <p className={styles.sectionDesc}>
+          체크아웃에 보여줄 결제수단을 선택합니다. 둘 다 켜면 고객이 고를 수
+          있습니다. (최소 하나는 켜져 있어야 합니다.)
+        </p>
+        <label className={styles.checkRow}>
+          <input
+            type="checkbox"
+            checked={form.payEnableVirtual}
+            onChange={(e) => setBool("payEnableVirtual", e.target.checked)}
+          />
+          <span>
+            <strong>가상계좌</strong> (토스 · 입금 자동확인)
+          </span>
+        </label>
+        <label className={styles.checkRow}>
+          <input
+            type="checkbox"
+            checked={form.payEnableDirect}
+            onChange={(e) => setBool("payEnableDirect", e.target.checked)}
+          />
+          <span>
+            <strong>무통장입금</strong> (위 고정계좌 · 관리자 수동확인)
+          </span>
+        </label>
       </div>
 
       <div className={styles.card} style={{ padding: 24, marginBottom: 20 }}>
