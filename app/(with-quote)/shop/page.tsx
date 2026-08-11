@@ -1,6 +1,6 @@
 import { getFeaturedSections } from "@/lib/data";
 import FeaturedSection from "@/components/home/FeaturedSection";
-import styles from "./listing.module.css";
+import styles from "../listing.module.css";
 
 export default async function HomePage() {
   const sections = await getFeaturedSections();
