@@ -3,6 +3,7 @@ import CategoryNav from "@/components/layout/CategoryNav";
 import { getSiteSettings } from "@/lib/settings";
 import { getNavCategories } from "@/lib/data";
 import { SiteSettingsProvider } from "@/components/SiteSettingsProvider";
+import styles from "./layout.module.css";
 
 // 견적서 셸을 쓰지 않는 페이지(로그인·회원가입·마이페이지·체크아웃·견적서·인트로 등):
 // 로고와 아이콘을 한 줄짜리 헤더 바로 묶어 보여준다.
@@ -15,9 +16,17 @@ export default async function PlainLayout({
   const navCategories = await getNavCategories();
   return (
     <SiteSettingsProvider value={settings}>
-      <Header />
-      <CategoryNav categories={navCategories} />
-      {children}
+      <div className={styles.headerNav}>
+        <div className={styles.header}>
+          <Header />
+        </div>
+        <div className={styles.categoryNav}>
+          <CategoryNav categories={navCategories} />
+        </div>
+      </div>
+      <div className={styles.content}>
+        {children}
+      </div>
     </SiteSettingsProvider>
   );
 }

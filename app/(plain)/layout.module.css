@@ -1,0 +1,29 @@
+/* (plain) 레이아웃 전용 스타일 */
+
+.wrapper {
+  display: contents;
+}
+
+.headerNav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  width: 100%;
+}
+
+.header {
+  position: relative;
+  z-index: 101;
+}
+
+.categoryNav {
+  position: relative;
+  z-index: 102;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+}
