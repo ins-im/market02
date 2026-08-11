@@ -67,6 +67,19 @@ export default function OrderActions({
     run(kind === "tax" ? "issue_tax_invoice" : "issue_cash_receipt");
   }
 
+  // 입금확인은 되돌리기 번거로운 상태 전환이라 한 번 더 확인받는다.
+  // (특히 무통장입금은 사람이 통장을 대조하는 수기 작업이라 오확인 위험이 있다.)
+  function confirmDeposit() {
+    if (
+      !window.confirm(
+        `주문 ${orderNo}\n\n입금이 실제로 들어온 것을 확인하셨나요?\n확인하면 '입금확인' 상태로 전환되고 배송 준비 단계로 넘어갑니다.`,
+      )
+    ) {
+      return;
+    }
+    run("confirm_deposit");
+  }
+
   // 배송 나간 뒤(배송중·배송완료)면 반품, 그 전이면 취소로 표기.
   const isReturn = status === "shipping" || status === "delivered";
   const cancelLabel = isReturn ? "반품·환불 처리" : "취소·환불 처리";
@@ -91,7 +104,7 @@ export default function OrderActions({
           <button
             className={`${styles.button} ${styles.buttonPrimary}`}
             disabled={busy}
-            onClick={() => run("confirm_deposit")}
+            onClick={confirmDeposit}
           >
             입금 확인
           </button>
