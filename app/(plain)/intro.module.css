@@ -98,8 +98,7 @@
 }
 
 /* 인트로 페이지 헤더: 영상 위에서 보이도록 로고를 흰색으로 */
-:global(.logoCell svg),
-:global(.logoCell img) {
+:global(.logo img) {
   filter: brightness(0) invert(1);
 }
 
