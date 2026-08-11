@@ -3,6 +3,17 @@
   position: static;
 }
 
+/* 인트로 페이지: 영상 배경에서 보이도록 아이콘을 흰색으로 */
+.introHeader :global(svg) {
+  color: white;
+  stroke: white;
+}
+
+.introHeader :global(button),
+.introHeader :global(a) {
+  color: white;
+}
+
 .inner {
   max-width: var(--max-width);
   margin: 0 auto;
