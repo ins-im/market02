@@ -9,6 +9,11 @@
   width: auto;
 }
 
+/* 인트로 페이지: 영상 배경에서 보이도록 흰색으로 표시 */
+.whiteLogo {
+  filter: brightness(0) invert(1);
+}
+
 /* 좁은 화면에선 우측 내비와 부딪히므로 한 단계 더 줄인다 */
 @media (max-width: 600px) {
   .img {

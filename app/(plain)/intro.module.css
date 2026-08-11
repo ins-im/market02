@@ -97,11 +97,6 @@
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 }
 
-/* 인트로 페이지 헤더: 영상 위에서 보이도록 로고를 흰색으로 */
-:global(.logo img) {
-  filter: brightness(0) invert(1);
-}
-
 /* 모바일 */
 @media (max-width: 1023px) {
   .hero {
