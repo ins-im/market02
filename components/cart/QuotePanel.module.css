@@ -144,10 +144,30 @@
   color: var(--color-text);
 }
 
-.quantity span {
-  min-width: 24px;
+.quantity button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.quantity input {
+  width: 32px;
   text-align: center;
   font-size: 12px;
+  color: var(--color-text);
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 1px 2px;
+}
+
+/* 편집 가능함을 알 수 있게 hover/focus 시 옅은 테두리 */
+.quantity input:hover {
+  border-color: var(--color-border, #e5e5e5);
+}
+
+.quantity input:focus {
+  outline: none;
+  border-color: var(--color-text-muted);
 }
 
 .itemPrice {
