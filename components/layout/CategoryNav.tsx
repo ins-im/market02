@@ -43,17 +43,17 @@ export default function CategoryNav({
     setOpenSub({ slug, left: r.left, top: r.bottom });
   };
 
-  // 표시할 활성 칩: 홈 → 스크롤 스파이, 카테고리 페이지 → 해당 slug, 그 외 → 없음
+  // 표시할 활성 칩: 상품메인(/shop) → 스크롤 스파이, 카테고리 페이지 → 해당 slug, 그 외 → 없음
   const active =
-    pathname === "/"
+    pathname === "/shop"
       ? spyActive
       : pathname.startsWith("/category/")
         ? pathname.split("/")[2] ?? null
         : null;
 
-  // 홈에서는 스크롤 위치에 따라 화면 상단의 카테고리 섹션을 활성화(스크롤 스파이)
+  // 상품메인(/shop)에서는 스크롤 위치에 따라 화면 상단의 카테고리 섹션을 활성화(스크롤 스파이)
   useEffect(() => {
-    if (pathname !== "/") return;
+    if (pathname !== "/shop") return;
     const sections = categories
       .filter((c) => c.onHome)
       .map((c) => document.getElementById(`category-${c.slug}`))
@@ -168,7 +168,7 @@ export default function CategoryNav({
                   <Link
                     href={
                       category.onHome
-                        ? `/#category-${category.slug}`
+                        ? `/shop#category-${category.slug}`
                         : `/category/${category.slug}`
                     }
                     className={`${styles.chip} ${
