@@ -226,7 +226,7 @@ export default function CategoryNav({
                   key={sub.slug}
                   href={
                     sub.onHome
-                      ? `/#category-${sub.slug}`
+                      ? `/shop#category-${sub.slug}`
                       : `/category/${sub.slug}`
                   }
                   className={`${styles.dropItem} ${
