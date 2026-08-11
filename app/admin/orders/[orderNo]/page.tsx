@@ -54,6 +54,7 @@ export default async function AdminOrderDetailPage({
           <OrderActions
             orderNo={o.orderNo}
             status={o.status}
+            total={o.total}
             tax={o.tax.state}
             cash={o.cash.state}
           />

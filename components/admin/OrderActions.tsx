@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import type { OrderStatus } from "@/lib/orders";
 import type { TaxInvoiceState } from "@/lib/admin";
 import { COURIERS } from "@/lib/couriers";
+import { formatPrice } from "@/lib/utils";
 import styles from "@/app/admin/admin.module.css";
 
 // 주문 상세의 관리 동작: 입금확인 → 배송준비 → 배송시작(운송장) → 배송완료,
@@ -12,11 +13,13 @@ import styles from "@/app/admin/admin.module.css";
 export default function OrderActions({
   orderNo,
   status,
+  total,
   tax,
   cash,
 }: {
   orderNo: string;
   status: OrderStatus;
+  total: number;
   tax: TaxInvoiceState;
   cash: "none" | "pending" | "issued";
 }) {
@@ -72,7 +75,7 @@ export default function OrderActions({
   function confirmDeposit() {
     if (
       !window.confirm(
-        `주문 ${orderNo}\n\n입금이 실제로 들어온 것을 확인하셨나요?\n확인하면 '입금확인' 상태로 전환되고 배송 준비 단계로 넘어갑니다.`,
+        `주문 ${orderNo}\n입금 금액 ${formatPrice(total)}\n\n이 금액이 실제로 입금된 것을 확인하셨나요?\n확인하면 '입금확인' 상태로 전환되고 배송 준비 단계로 넘어갑니다.`,
       )
     ) {
       return;
