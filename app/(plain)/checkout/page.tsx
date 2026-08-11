@@ -444,16 +444,14 @@ export default function CheckoutPage() {
                     checked={payMethod === "direct"}
                     onChange={() => setPayMethod("direct")}
                   />
-                  무통장입금 (고정계좌)
+                  무통장입금
                 </label>
               </div>
             ) : (
               // 하나만 켜져 있으면 그 수단으로 고정 표시
               <div className={styles.payMethod}>
                 <span className={styles.radioOn} aria-hidden />
-                {payMethod === "virtual"
-                  ? "무통장입금 (가상계좌)"
-                  : "무통장입금 (고정계좌)"}
+                {payMethod === "virtual" ? "무통장입금 (가상계좌)" : "무통장입금"}
               </div>
             )}
 
