@@ -34,6 +34,23 @@ export async function POST(request: Request) {
 
   try {
     const user = await login(parsed.data);
+
+    // 입구(scope)×계정 role 강제 — 비번은 맞았지만 경로가 안 맞으면 쿠키를 굽지 않고 거부.
+    // (관리자는 /admin-login 으로만, 고객 입구로는 관리자 로그인 불가)
+    const scope = parsed.data.scope ?? "customer";
+    if (scope === "admin" && user.role !== "ADMIN") {
+      return Response.json(
+        { error: "관리자 권한이 없는 계정입니다.", code: "NOT_ADMIN" },
+        { status: 403 },
+      );
+    }
+    if (scope !== "admin" && user.role === "ADMIN") {
+      return Response.json(
+        { error: "관리자는 관리자 로그인 페이지를 이용하세요.", code: "ADMIN_WRONG_ENTRY" },
+        { status: 403 },
+      );
+    }
+
     await clearLoginThrottle(key); // 성공 → 카운트 리셋
     await setSessionCookie(sessionFor(user));
     return Response.json({ user });

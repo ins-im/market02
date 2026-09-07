@@ -11,9 +11,9 @@ export async function proxy(request: NextRequest) {
   const token = request.cookies.get(SESSION_COOKIE)?.value;
   const session = token ? await verifySession(token) : null;
 
-  // 관리자 영역: ADMIN 만
+  // 관리자 영역: ADMIN 만 (미인증은 고객용이 아닌 관리자 로그인 페이지로 보낸다)
   if (pathname.startsWith("/admin")) {
-    if (!session) return redirectToLogin(request);
+    if (!session) return NextResponse.redirect(new URL("/admin-login", request.url));
     if (session.role !== "ADMIN") {
       return NextResponse.redirect(new URL("/", request.url));
     }

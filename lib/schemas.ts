@@ -14,6 +14,9 @@ export const passwordSchema = z.string().refine(isValidPassword, PASSWORD_ERROR)
 export const loginSchema = z.object({
   email: emailSchema,
   password: z.string().min(1, "비밀번호를 입력하세요."),
+  // 로그인 입구 구분 — admin: 관리자 로그인 페이지, 없거나 customer: 고객 로그인.
+  // 서버가 이 값×계정 role 을 대조해 경로를 강제한다(관리자는 admin 입구로만).
+  scope: z.enum(["customer", "admin"]).optional(),
 });
 
 // 개인가입: 이메일+비밀번호만 (이름 등은 체크아웃에서 수집)

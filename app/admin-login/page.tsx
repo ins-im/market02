@@ -22,15 +22,12 @@ export default function AdminLoginPage() {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, scope: "admin" }),
       });
       const data = await res.json();
       if (!res.ok) {
+        // 관리자 권한 없는 계정(403)도 서버가 메시지를 내려주므로 그대로 표시한다.
         setError(data.error ?? "로그인에 실패했습니다.");
-        return;
-      }
-      if (data.user?.role !== "ADMIN") {
-        setError("관리자 권한이 없는 계정입니다.");
         return;
       }
       router.push("/admin/members");
