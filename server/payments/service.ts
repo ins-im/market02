@@ -23,7 +23,9 @@ async function apply(
   order: OrderWithPayment,
   payment: TossPayment,
 ): Promise<void> {
-  const raw = JSON.parse(JSON.stringify(payment)); // Json 컬럼 저장용(감사)
+  // Json 컬럼 저장용(감사). 웹훅 검증용 비밀값 secret 은 DB 에 남기지 않는다.
+  const auditable = { ...payment, secret: undefined };
+  const raw = JSON.parse(JSON.stringify(auditable));
   const va = payment.virtualAccount;
 
   switch (payment.status) {

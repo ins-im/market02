@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { listMembersForAdmin } from "@/lib/admin";
 import StatusPill from "@/components/admin/StatusPill";
+import Pagination from "@/components/admin/Pagination";
 import { formatDate } from "@/lib/datetime";
 import styles from "../admin.module.css";
 
@@ -195,45 +196,7 @@ export default async function AdminMembersPage({
         )}
       </div>
 
-      {totalPages > 1 && (
-        <div className={styles.pagination}>
-          {page > 1 ? (
-            <Link
-              href={hrefWith({ page: page - 1 })}
-              className={styles.button}
-            >
-              ← 이전
-            </Link>
-          ) : (
-            <span
-              className={styles.button}
-              style={{ opacity: 0.5, cursor: "default" }}
-              aria-disabled
-            >
-              ← 이전
-            </span>
-          )}
-          <span className={styles.count}>
-            {page} / {totalPages}
-          </span>
-          {page < totalPages ? (
-            <Link
-              href={hrefWith({ page: page + 1 })}
-              className={styles.button}
-            >
-              다음 →
-            </Link>
-          ) : (
-            <span
-              className={styles.button}
-              style={{ opacity: 0.5, cursor: "default" }}
-              aria-disabled
-            >
-              다음 →
-            </span>
-          )}
-        </div>
-      )}
+      <Pagination page={page} totalPages={totalPages} hrefWith={hrefWith} />
     </div>
   );
 }
