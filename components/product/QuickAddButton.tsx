@@ -57,7 +57,11 @@ export default function QuickAddButton({ product }: { product: Product }) {
       aria-pressed={inQuote}
       data-tip={label}
     >
-      <ShoppingCart size={13} strokeWidth={1.75} />
+      <ShoppingCart
+        size={23}
+        strokeWidth={1.75}
+        style={{ transform: "translate(-1px, 1px)" }}
+      />
     </button>
   );
 }
