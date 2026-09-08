@@ -81,6 +81,21 @@
   color: #93c5fd;
   text-decoration: none;
 }
+.logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #f87171;
+  font-size: 13px;
+  cursor: pointer;
+}
+.logout:hover {
+  color: #fca5a5;
+}
 .main {
   flex: 1;
   min-width: 0;
@@ -88,12 +103,15 @@
 }
 
 /* ── 페이지 ── */
+/* max-width 로 폭을 제한하고 margin 좌우 auto 로 넓은 모니터에서 가운데 정렬 */
 .page {
   max-width: 1000px;
+  margin: 0 auto;
 }
 /* 컬럼이 많은 목록(상품 관리 등)용 넓은 페이지 */
 .pageWide {
   max-width: 1320px;
+  margin: 0 auto;
 }
 .pageTitle {
   font-size: 22px;
@@ -668,6 +686,176 @@
   font-size: 12px;
   color: #2563eb;
   margin-top: 4px;
+}
+/* 대기 카드 상단: 라벨 + 아이콘 */
+.statTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.statIcon {
+  color: #9ca3af;
+  flex-shrink: 0;
+}
+
+/* ── 대시보드: 매출 KPI ── */
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+.kpiCard {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 20px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+}
+.kpiIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: #eff6ff;
+  color: #2563eb;
+}
+.kpiText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.kpiValue {
+  font-size: 20px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── 대시보드: 섹션 제목 ── */
+.sectionTitle {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0 0 12px;
+  color: #374151;
+}
+
+/* ── 대시보드: 상태분포 + 최근주문 2단 ── */
+.dashSplit {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 20px;
+  margin-top: 28px;
+}
+.panel {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+}
+.panelHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.panelMore {
+  font-size: 12px;
+  color: #2563eb;
+  text-decoration: none;
+}
+
+/* 상태 분포 막대 */
+.barList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.barRow {
+  display: grid;
+  grid-template-columns: 64px 1fr 40px;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+.barLabel {
+  color: #6b7280;
+}
+.barTrack {
+  height: 8px;
+  border-radius: 4px;
+  background: #f3f4f6;
+  overflow: hidden;
+}
+.barFill {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: #2563eb;
+  min-width: 2px;
+}
+.barCount {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: #374151;
+}
+
+/* 최근 주문 표 */
+.recentTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.recentTable td {
+  padding: 8px 6px;
+  border-top: 1px solid #f3f4f6;
+  vertical-align: middle;
+}
+.recentTable tr:first-child td {
+  border-top: 0;
+}
+.recentNo {
+  color: #2563eb;
+  text-decoration: none;
+  font-variant-numeric: tabular-nums;
+}
+.recentName {
+  color: #374151;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.recentAmount {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.recentDate {
+  text-align: right;
+  color: #9ca3af;
+  white-space: nowrap;
+}
+.empty {
+  font-size: 13px;
+  color: #9ca3af;
+  margin: 8px 0 0;
+}
+
+/* 좁은 화면에선 2단 → 1단 */
+@media (max-width: 900px) {
+  .dashSplit {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ── 주문 상태 배지 ── */

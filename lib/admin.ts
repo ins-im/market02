@@ -28,6 +28,7 @@ export { signedPrivateUrl } from "@/server/storage";
 export {
   getDashboardStats,
   type DashboardStats,
+  type RecentOrder,
 } from "@/server/dashboard/service";
 
 export {

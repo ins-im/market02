@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import { getSessionUser } from "@/lib/session";
 import { getMe } from "@/lib/admin";
 import AdminNav from "@/components/admin/AdminNav";
+import LogoutButton from "@/components/admin/LogoutButton";
 import styles from "./admin.module.css";
 
 // 어드민 전용 레이아웃 (쇼핑몰 헤더/견적패널 없음).
@@ -26,9 +26,7 @@ export default async function AdminLayout({
         <AdminNav />
         <div className={styles.sidebarFoot}>
           <span className={styles.adminEmail}>{user.email}</span>
-          <Link href="/" className={styles.backToShop}>
-            ← 쇼핑몰로
-          </Link>
+          <LogoutButton />
         </div>
       </aside>
       <main className={styles.main}>{children}</main>
