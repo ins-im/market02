@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getSessionUser } from "@/lib/session";
-import { getMe } from "@/server/auth/service";
+import { getMe } from "@/lib/admin";
 import AdminNav from "@/components/admin/AdminNav";
 import styles from "./admin.module.css";
 
