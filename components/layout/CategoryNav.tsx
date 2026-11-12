@@ -166,11 +166,7 @@ export default function CategoryNav({
                   onMouseLeave={hasSub ? scheduleClose : undefined}
                 >
                   <Link
-                    href={
-                      category.onHome
-                        ? `/shop#category-${category.slug}`
-                        : `/category/${category.slug}`
-                    }
+                    href={`/category/${category.slug}`}
                     className={`${styles.chip} ${
                       active === category.slug ? styles.active : ""
                     }`}
@@ -224,11 +220,7 @@ export default function CategoryNav({
               {subs.map((sub) => (
                 <Link
                   key={sub.slug}
-                  href={
-                    sub.onHome
-                      ? `/shop#category-${sub.slug}`
-                      : `/category/${sub.slug}`
-                  }
+                  href={`/category/${sub.slug}`}
                   className={`${styles.dropItem} ${
                     active === sub.slug ? styles.dropItemActive : ""
                   }`}

@@ -18,7 +18,7 @@ export default async function CategoryPage({
 
   return (
     <div className={styles.page}>
-      <h1 className={styles.title}>{category.name}</h1>
+      <h1 className={styles.categoryTitle}>{category.en}</h1>
       <p className={styles.count}>{products.length}개 상품</p>
       <ProductListing products={products} />
     </div>

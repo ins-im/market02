@@ -29,6 +29,15 @@
   font-weight: var(--fw-emphasis);
 }
 
+/* 카테고리 페이지 전용: 영문명을 레퍼런스처럼 크고 또렷하게 */
+.categoryTitle {
+  font-size: clamp(34px, 5vw, 56px);
+  font-weight: var(--fw-display);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
 .count {
   margin-top: 6px;
   margin-bottom: 28px;
