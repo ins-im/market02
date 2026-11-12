@@ -24,18 +24,64 @@
   color: var(--color-text);
 }
 
+/* 영문명을 "맨 앞 글자만 대문자"로 — DB 영문명 대소문자와 무관하게
+   Hardware / Drawer system 처럼 보이게 한다 (heroTitle 과 함께 사용) */
+.firstCap {
+  text-transform: lowercase;
+}
+
+.firstCap::first-letter {
+  text-transform: uppercase;
+}
+
 .title {
   font-size: 24px;
   font-weight: var(--fw-emphasis);
 }
 
-/* 카테고리 페이지 전용: 영문명을 레퍼런스처럼 크고 또렷하게 */
-.categoryTitle {
-  font-size: clamp(34px, 5vw, 56px);
-  font-weight: var(--fw-display);
-  letter-spacing: -0.02em;
-  line-height: 1;
-  text-transform: uppercase;
+/* 카테고리 페이지 — shop 섹션처럼 좌측 헤더 열 + 우측 상품 2단 */
+.catLayout {
+  display: grid;
+  grid-template-columns: 130px minmax(0, 1fr);
+  gap: 24px;
+  /* shop 의 섹션(.section)과 동일한 상단 여백 — 큰 제목과 헤더 사이 간격을 맞춘다 */
+  margin-top: 56px;
+}
+
+.catAside {
+  align-self: start;
+  /* 우측 상품 열은 보기전환 툴바(버튼 34px + 아래 여백 16px = 50px)만큼
+     상품이 내려가므로, 헤더도 같은 만큼 내려 상품 윗선과 수평을 맞춘다 */
+  margin-top: 50px;
+}
+
+.catProducts {
+  min-width: 0;
+}
+
+/* 모바일: 헤더를 상품 위로 올리는 1단 레이아웃 */
+@media (max-width: 640px) {
+  .catLayout {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+/* 카테고리 페이지 헤더 — shop(홈)의 카테고리 섹션 헤더와 동일한 표기:
+   한글명(주) 아래 영문명(보조)을 작고 흐리게 둔다 */
+.catName {
+  font-size: 20px;
+  font-weight: var(--fw-emphasis);
+  line-height: 1.25;
+}
+
+.catEn {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: var(--fw-emphasis);
+  letter-spacing: 0.02em;
+  color: var(--color-text-muted);
 }
 
 .count {

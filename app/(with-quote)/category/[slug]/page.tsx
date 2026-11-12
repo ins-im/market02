@@ -18,9 +18,26 @@ export default async function CategoryPage({
 
   return (
     <div className={styles.page}>
-      <h1 className={styles.categoryTitle}>{category.en}</h1>
-      <p className={styles.count}>{products.length}개 상품</p>
-      <ProductListing products={products} />
+      {/* shop 상단의 큰 "Products"와 동일한 대형 영문 제목 (맨 앞 글자만 대문자) */}
+      <header className={styles.hero}>
+        <h1 className={`${styles.heroTitle} ${styles.firstCap}`}>
+          {category.en}
+        </h1>
+      </header>
+      {/* shop 섹션처럼 좌측 헤더 열 + 우측 상품 2단 레이아웃 */}
+      <section className={styles.catLayout}>
+        <aside className={styles.catAside}>
+          <h2 className={styles.catName}>
+            {category.name}
+            {/* 영문명은 제목의 보조 표기 — shop 섹션 헤더와 동일하게 아래에 작게 둔다 */}
+            <span className={styles.catEn}>{category.en}</span>
+          </h2>
+          <p className={styles.count}>{products.length}개 상품</p>
+        </aside>
+        <div className={styles.catProducts}>
+          <ProductListing products={products} />
+        </div>
+      </section>
     </div>
   );
 }
