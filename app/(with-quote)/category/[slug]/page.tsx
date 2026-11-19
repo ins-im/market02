@@ -27,11 +27,7 @@ export default async function CategoryPage({
       {/* shop 섹션처럼 좌측 헤더 열 + 우측 상품 2단 레이아웃 */}
       <section className={styles.catLayout}>
         <aside className={styles.catAside}>
-          <h2 className={styles.catName}>
-            {category.name}
-            {/* 영문명은 제목의 보조 표기 — shop 섹션 헤더와 동일하게 아래에 작게 둔다 */}
-            <span className={styles.catEn}>{category.en}</span>
-          </h2>
+          <h2 className={styles.catName}>{category.name}</h2>
           <p className={styles.count}>{products.length}개 상품</p>
         </aside>
         <div className={styles.catProducts}>

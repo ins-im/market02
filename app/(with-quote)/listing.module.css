@@ -67,21 +67,11 @@
   }
 }
 
-/* 카테고리 페이지 헤더 — shop(홈)의 카테고리 섹션 헤더와 동일한 표기:
-   한글명(주) 아래 영문명(보조)을 작고 흐리게 둔다 */
+/* 카테고리 페이지 사이드바 헤더 — 상단 대형 영문 제목이 있으므로 한글명만 둔다 */
 .catName {
   font-size: 20px;
   font-weight: var(--fw-emphasis);
   line-height: 1.25;
-}
-
-.catEn {
-  display: block;
-  margin-top: 2px;
-  font-size: 12px;
-  font-weight: var(--fw-emphasis);
-  letter-spacing: 0.02em;
-  color: var(--color-text-muted);
 }
 
 .count {
